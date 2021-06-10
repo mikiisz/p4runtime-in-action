@@ -1,0 +1,21 @@
+version: "3"
+services:
+
+  # P4 compiler
+  compiler:
+    image: p4lang/p4c
+    volumes:
+      - ./configs:/p4c/configs
+
+  # P4Runtime-enabled Mininet
+  mininet:
+    image: opennetworking/p4mn
+    privileged: true
+    ports:
+      - 50001:50001
+
+  # IPython shell for P4Runtime
+  shell:
+    image: p4lang/p4runtime-sh
+    volumes:
+      - ./configs:/tmp/configs
