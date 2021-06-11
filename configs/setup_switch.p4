@@ -91,8 +91,7 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
 }
 
 control MyIngress(inout headers hdr, inout metadata meta,
-                    inout standard_metadata_t standard_metadata)
-{
+                  inout standard_metadata_t standard_metadata) {
 
     action forward(egressSpec_t port) {
         standard_metadata.egress_spec = port;

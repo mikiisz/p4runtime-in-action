@@ -6,7 +6,7 @@ updates {
       match {
         field_id: 1
         exact {
-          value: "\x00 \x00 \x00 \x00 \x00 \x01"
+          value: "\x00\x00\x00\x00\x00\x01"
         }
       }
       action {
@@ -14,7 +14,7 @@ updates {
           action_id: 0 # TODO: provide action id
           params {
             param_id: 1
-            value: "\x00 \x01"
+            value: "\x00\x01"
           }
         }
       }

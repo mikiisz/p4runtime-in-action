@@ -4,8 +4,9 @@
 
 1. [Setup](#1-setup)
 2. [Exercise overview](#2-exercise-overview)
-2. [What is P4Runtime](#3-what-is-p4runtime)
-2. [Action](#4-action)
+3. [What is P4Runtime](#3-what-is-p4runtime)
+4. [Action](#4-action)
+5. [References](#5-references)
 
 ### 1. Setup
 
@@ -131,3 +132,137 @@ It gives great understanding of concepts behind the API and helps to go through 
 ### 4. Action!
 
 Let's get hands dirty and set up our first switch table. 
+
+Try to ping host h1 with host h2 in mininet console:
+
+```
+mininet> h1 ping -c 1 h2
+```
+
+It fails, as there is no rules set in switch table.
+
+In the setup stages we complied switch definition, where we defined a basic empty table called `MyIngress.ether_addr_table`.
+
+![table definition](blobs/table-definition.png)
+
+The ids associated with table and actions will differ in your example as they are generated once per instance. 
+Notice that we have described two actions: `MyIngress.forward` and `MyIngress.to_controller`.
+The first one is an action that will be used provide a connection between host 1 (switch port 1) and host 2 (switch port 2).
+The second is used as an action definition to switch controller.
+To find its P4 definition check `./configs/setup_switch.p4` file and `MyIngress` controller.
+
+#### 4.1. Add egress rule to port 2, host 2
+
+We start by adding an entry to predefined switch ingress table. The protobuf data structure for P4 runtimes rule looks like this:
+
+```
+updates {
+  type: <TYPE>
+  entity {
+    table_entry {
+      table_id: <TABLE ID>
+      match {
+       <MATCH RULE>
+      }
+      action {
+        action {
+          action_id: <ACTION ID>
+          params {
+            <PARAMS>
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Fields defined with `< >` needs to be supplied according to the policies defines in `.p4` document. 
+Especially the `<MATCH RULE>` and `<PARAMS>` must satisfy `MyIngress` control.
+For this exercise we prepared a template which you can reuse: `./config/forward_to_h2.pb`.
+
+The `table_id` stands for `MyIngress.ether_add_table`, and the `id` in its `match` field stands for `hdr.ethernet.dstAddr`. 
+The following hex value is 6 bytes long, meaning the MAC address `00:00:00:00:00:02`.
+Similarly, `action_id` points to `MyIngress.forward`, and the value of the following `param_id`  uses 2 bytes in hexadecimal notation to indicate that the destination port. 
+
+Our proposal looks like this:
+
+```
+updates {
+  type: INSERT
+  entity {
+    table_entry {
+      table_id: 0 # TODO: provide table Id
+      match {
+        field_id: 1
+        exact {
+          value: "\x00\x00\x00\x00\x00\x02"
+        }
+      }
+      action {
+        action {
+          action_id: 0 # TODO: provide action id
+          params {
+            param_id: 1
+            value: "\x00\x02"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+After setting up the protobuf file, we can add it and view it with a usage of:
+
+```
+P4Runtime sh >>> Write("/tmp/configs/forward_to_h2.pb")
+
+P4Runtime sh >>> table_entry["MyIngress.ether_addr_table"].read(lambda a: print(a))
+```
+
+![Added forward rule](blobs/added_forward_rule.png)
+
+Let's check if the pinging works now:
+
+```
+mininet> h1 ping -c 1 h2
+```
+
+It fails again. To provide connectivity we need to add rule to route the packet back to the sender.
+
+#### 4.2. Route back packet to port 1, host 1
+
+We need to add another entry to the table to verify that the ping packets are correctly going back and forth between the two hosts.
+Just like in the above step we need to update `MyIngress.ether_add_table` to unblock traffic.
+The rules for adding the table update are the same.
+If you need some additional support, we prepared a template for that in `./configs/route_back_to_h1.pb`.
+However, try to provide that protobuf file based on the example from step *1.4*.
+
+After that step, we expect to have such a switching table:
+
+![switching table](blobs/switch-table.png)
+
+#### 4.3. Ping hosts
+
+```
+mininet> h1 ping -c 1 h2
+
+mininet> h2 ping -c 1 h1
+```
+
+Try to confirm if pinging works in both directions.
+We owe that condition thanks to the table rules we added.
+Let's check them to confirm what was needed:
+
+```
+P4Runtime sh >>> table_entry["MyIngress.ether_addr_table"].read(lambda a: print(a))
+```
+
+![complete table](blobs/complete-table.png)
+
+### 5. References
+
+* [P4Runtime firstbite](https://github.com/yyasuda/P4Runtime-firstbite)
+* [P4Runtime tutorial from P4lang](https://github.com/p4lang/tutorials/tree/master/exercises/p4runtime)
+* [Next-Gen SDN Tutorial from ONF](https://www.youtube.com/watch?v=KRx92qSLgo4)
