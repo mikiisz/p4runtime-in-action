@@ -25,7 +25,6 @@ services:
     image: opennetworking/p4mn
     command: --arp --topo single,2 --mac
     privileged: true
-    tty: true
     networks:
       mininet_network:
         ipv4_address: 172.20.1.5
@@ -42,5 +41,4 @@ services:
     volumes:
       - ./configs:/tmp/configs
     depends_on:
-      - mininet
       - compiler

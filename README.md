@@ -1,6 +1,11 @@
 ## P4runtime in action!
 
-### Setup
+# Table of Contents
+
+1. [Setup](#1-setup)
+2. [Exercise overview](#2-exercise-overview)
+
+### 1. Setup
 
 For this tutorial you have access to three dockerized tools to work with:
 
@@ -10,9 +15,9 @@ For this tutorial you have access to three dockerized tools to work with:
 
 We use Mininet to create simple topology with 2 hosts and a switch. The P4Runtime Shell is used as the controller role. It uses gRPC to connect the controller and the switch. After P4Runtime Shell starts, it will install specified P4 program to the switch through the gRPC connection.
 
-![network](blobs/network.png)
+![network](blobs/network-diagram.png)
 
-#### 1. Compile P4 switch definition
+#### 1.1. Compile P4 switch definition
 
 Start P4 compiler shell:
 
@@ -30,7 +35,7 @@ p4c --target bmv2 --arch v1model --p4runtime-files p4info.txt setup_switch.p4
 
 As an output, it will generate few files with definition of our testing switch. Later, we will launch the P4 Runtime Shell, using the p4info.txt and setup_switch.json files generated.
 
-#### 2. Launch the Mininet Environment
+#### 1.2. Launch the Mininet Environment
 
 Start a Mininet environment that supports the P4 Runtime in docker environment. Note that at boot time, the `--arp` and `--mac` options allow you to do things like ping tests without ARP processing. Below command will create a simple topology for our exercise:
 
@@ -48,7 +53,7 @@ mininet> h1 ifconfig h1-eth0
 
 Make sure to leave that mininet server running in the background.
 
-#### 3. Connect P4 Runtime Shell to Mininet
+#### 1.3. Connect P4 Runtime Shell to Mininet
 
 Start P4 Runtime Shell. Make sure to connect properly to your mininet server running in the background from step #2. You can find the server id by running `sh ifconfig` in the mininet terminal:
 
@@ -66,11 +71,13 @@ P4Runtime sh >>> tables["MyIngress.ether_addr_table"]
 
 Congratulations, your setup is finished.
 
-### Automated setup
+### 1.4 Automated setup
 
-For future works, to make your life easier, you can use a one liner to automate the setup of above steps. To simply run steps #1, #2, #3 to build your P4 environment run:
+For future works, to make your life easier, you can use this oneliners to automate the setup of above steps:
 
 ```
+docker-compose -f docker-compose.automated.yml run mininet
+
 docker-compose -f docker-compose.automated.yml run shell
 ```
 
@@ -81,3 +88,5 @@ P4Runtime sh >>> tables
 
 P4Runtime sh >>> tables["MyIngress.ether_addr_table"] 
 ```
+
+### 2. Exercise overview 
