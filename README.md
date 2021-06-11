@@ -30,7 +30,7 @@ p4c --target bmv2 --arch v1model --p4runtime-files p4info.txt setup_switch.p4
 
 As an output, it will generate few files with definition of our testing switch. Later, we will launch the P4 Runtime Shell, using the p4info.txt and setup_switch.json files generated.
 
-#### 2. Launching the Mininet Environment
+#### 2. Launch the Mininet Environment
 
 Start a Mininet environment that supports the P4 Runtime in docker environment. Note that at boot time, the `--arp` and `--mac` options allow you to do things like ping tests without ARP processing. Below command will create a simple topology for our exercise:
 
@@ -48,7 +48,7 @@ mininet> h1 ifconfig h1-eth0
 
 Make sure to leave that mininet server running in the background.
 
-#### 3. Connecting P4 Runtime Shell to Mininet
+#### 3. Connect P4 Runtime Shell to Mininet
 
 Start P4 Runtime Shell. Make sure to connect properly to your mininet server running in the background from step #2. You can find the server id by running `sh ifconfig` in the mininet terminal:
 
