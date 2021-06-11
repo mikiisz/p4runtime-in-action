@@ -5,6 +5,7 @@
 1. [Setup](#1-setup)
 2. [Exercise overview](#2-exercise-overview)
 2. [What is P4Runtime](#3-what-is-p4runtime)
+2. [Action](#4-action)
 
 ### 1. Setup
 
@@ -122,3 +123,11 @@ It is the responsibility of target implementers to instrument the server.
 The controller can access the P4 entities which are declared in the P4Info metadata. 
 The P4Info structure is defined by p4info.proto, another Protobuf file available as part of the standard.
 
+We are recommending to watch this short explanation of P4 and P4 runtime workflow. 
+It gives great understanding of concepts behind the API and helps to go through the prepared exercises without doubts:
+
+[![youtube video](https://img.youtube.com/vi/KRx92qSLgo4/0.jpg)](https://www.youtube.com/watch?v=KRx92qSLgo4)
+
+### 4. Action!
+
+Let's get hands dirty and set up our first switch table. 
