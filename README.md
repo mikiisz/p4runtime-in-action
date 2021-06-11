@@ -10,7 +10,7 @@ For this tutorial you have access to three dockerized tools to work with:
 
 We use Mininet to create simple topology with 2 hosts and a switch. The P4Runtime Shell is used as the controller role. It uses gRPC to connect the controller and the switch. After P4Runtime Shell starts, it will install specified P4 program to the switch through the gRPC connection.
 
-![network](blobs/network.png)
+![network](blobs/network-diagram.png)
 
 #### 1. Compile P4 switch definition
 
