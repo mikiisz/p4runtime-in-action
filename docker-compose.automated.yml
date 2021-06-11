@@ -1,0 +1,46 @@
+version: "3"
+
+networks:
+  mininet_network:
+    ipam:
+      config:
+        - subnet: 172.20.1.0/16
+
+services:
+
+  # P4 compiler
+  compiler:
+    image: p4lang/p4c
+    command:
+      - bash
+      - -c
+      - |
+        cd configs
+        p4c --target bmv2 --arch v1model --p4runtime-files p4info.txt setup_switch.p4
+    volumes:
+      - ./configs:/p4c/configs
+
+  # P4Runtime-enabled Mininet
+  mininet:
+    image: opennetworking/p4mn
+    command: --arp --topo single,2 --mac
+    privileged: true
+    tty: true
+    networks:
+      mininet_network:
+        ipv4_address: 172.20.1.5
+    ports:
+      - 50001:50001
+
+  # IPython shell for P4Runtime
+  shell:
+    image: p4lang/p4runtime-sh
+    command: --grpc-addr 172.20.1.5:50001 --device-id 1 --election-id 0,1 --config /tmp/configs/p4info.txt,/tmp/configs/setup_switch.json
+    networks:
+      mininet_network:
+        ipv4_address: 172.20.1.6
+    volumes:
+      - ./configs:/tmp/configs
+    depends_on:
+      - mininet
+      - compiler

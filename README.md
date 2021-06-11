@@ -2,7 +2,7 @@
 
 ### Setup
 
-For this tutorial you have access to three tools to work with:
+For this tutorial you have access to three dockerized tools to work with:
 
 * P4 compiler ([source](https://github.com/p4lang/p4c))
 * P4Runtime-enabled Mininet ([source](https://github.com/opennetworkinglab/p4mn-docker))
@@ -17,7 +17,7 @@ We use Mininet to create simple topology with 2 hosts and a switch. The P4Runtim
 Start P4 compiler shell:
 
 ```
-docker-compose run compiler bash
+docker-compose run compiler
 ```
 
 This docker has attached a `./configs` directory as its volume. You can find there necessary dependencies for network configuration. Compile `setup_switch.p4`:
@@ -46,6 +46,8 @@ mininet> net
 mininet> h1 ifconfig h1-eth0
 ```
 
+Make sure to leave that mininet server running in the background.
+
 #### 3. Connecting P4 Runtime Shell to Mininet
 
 Start P4 Runtime Shell. Make sure to connect properly to your mininet server running in the background from step #2. You can find the server id by running `sh ifconfig` in the mininet terminal:
@@ -63,3 +65,19 @@ P4Runtime sh >>> tables["MyIngress.ether_addr_table"]
 ```
 
 Congratulations, your setup is finished.
+
+### Automated setup
+
+For future works, to make your life easier, you can use a one liner to automate the setup of above steps. To simply run steps #1, #2, #3 to build your P4 environment run:
+
+```
+docker-compose -f docker-compose.automated.yml run shell
+```
+
+Confirm the results by running:
+
+```
+P4Runtime sh >>> tables 
+
+P4Runtime sh >>> tables["MyIngress.ether_addr_table"] 
+```
