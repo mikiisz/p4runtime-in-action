@@ -126,7 +126,7 @@ The P4Info structure is defined by p4info.proto, another Protobuf file available
 We are recommending to watch this short explanation of P4 and P4 runtime workflow. 
 It gives great understanding of concepts behind the API and helps to go through the prepared exercises without doubts:
 
-[![youtube video](https://img.youtube.com/vi/KRx92qSLgo4/0.jpg)](https://www.youtube.com/watch?v=KRx92qSLgo4)
+[![youtube video](blobs/youtube-thumbnail.png)](https://www.youtube.com/watch?v=KRx92qSLgo4)
 
 ### 4. Action!
 
