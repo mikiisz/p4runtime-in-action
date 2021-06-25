@@ -30,7 +30,7 @@ cd p4runtime-in-action/
 ```
 
 ![network](blobs/network-diagram.png)\
--> *Img 1: Network configuration* <-
+*Img 1: Network configuration*
 
 #### 1.1. Compile P4 switch definition
 
@@ -182,7 +182,7 @@ Below figure represents the P4Runtime Architecture. The device or target to be c
 A role defines a grouping of P4 entities.
 
 ![P4 runtime architecture](blobs/p4runtime-architecture.svg)\
--> *Img 2: P4Runtime architecture* <-
+*Img 2: P4Runtime architecture*
 
 The P4Runtime API defines the messages and semantics of the interface between the client(s) and the server. 
 The API is specified by the p4runtime.proto Protobuf file.
@@ -217,7 +217,7 @@ PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
 In the setup stages we complied switch definition, where we defined a basic empty table called `MyIngress.ether_addr_table`.
 
 ![table definition](blobs/table-definition.png)\
--> *Img 3: Empty table definition* <-
+*Img 3: Empty table definition*
 
 The ids associated with table and actions will differ in your example as they are generated once per instance. 
 Notice that we have described two actions: `MyIngress.forward` and `MyIngress.to_controller`.
@@ -296,7 +296,7 @@ P4Runtime sh >>> table_entry["MyIngress.ether_addr_table"].read(lambda a: print(
 ```
 
 ![Added forward rule](blobs/added_forward_rule.png)\
--> *Img 4: Table with added forward rule* <-
+*Img 4: Table with added forward rule*
 
 Let's check if the pinging works now:
 
@@ -317,7 +317,7 @@ However, try to provide that protobuf file based on the example from step *1.4*.
 After that step, we expect to have such a switching table:
 
 ![switching table](blobs/switch-table.png)\
--> *Img 5: Switching table* <-
+*Img 5: Switching table*
 
 #### 4.3. Ping hosts
 
@@ -336,7 +336,7 @@ P4Runtime sh >>> table_entry["MyIngress.ether_addr_table"].read(lambda a: print(
 ```
 
 ![complete table](blobs/complete-table.png)\
--> *Img 6: Final version of the table* <-
+*Img 6: Final version of the table*
 
 ### 5. References
 
