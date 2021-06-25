@@ -29,7 +29,7 @@ and move to created directory
 cd p4runtime-in-action/
 ```
 
-![network](blobs/network-diagram.png)\
+![network](blobs/network-diagram.png)  
 *Img 1: Network configuration*
 
 #### 1.1. Compile P4 switch definition
@@ -181,7 +181,7 @@ The P4Runtime API is a control plane specification for controlling the data plan
 Below figure represents the P4Runtime Architecture. The device or target to be controlled is at the bottom, and one or more controllers is shown at the top. 
 A role defines a grouping of P4 entities.
 
-![P4 runtime architecture](blobs/p4runtime-architecture.svg)\
+![P4 runtime architecture](blobs/p4runtime-architecture.svg)  
 *Img 2: P4Runtime architecture*
 
 The P4Runtime API defines the messages and semantics of the interface between the client(s) and the server. 
@@ -216,7 +216,7 @@ PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
 
 In the setup stages we complied switch definition, where we defined a basic empty table called `MyIngress.ether_addr_table`.
 
-![table definition](blobs/table-definition.png)\
+![table definition](blobs/table-definition.png)  
 *Img 3: Empty table definition*
 
 The ids associated with table and actions will differ in your example as they are generated once per instance. 
@@ -295,7 +295,7 @@ P4Runtime sh >>> Write("/tmp/configs/forward_to_h2.pb")
 P4Runtime sh >>> table_entry["MyIngress.ether_addr_table"].read(lambda a: print(a))
 ```
 
-![Added forward rule](blobs/added_forward_rule.png)\
+![Added forward rule](blobs/added_forward_rule.png)  
 *Img 4: Table with added forward rule*
 
 Let's check if the pinging works now:
@@ -316,7 +316,7 @@ However, try to provide that protobuf file based on the example from step *1.4*.
 
 After that step, we expect to have such a switching table:
 
-![switching table](blobs/switch-table.png)\
+![switching table](blobs/switch-table.png)  
 *Img 5: Switching table*
 
 #### 4.3. Ping hosts
@@ -335,7 +335,7 @@ Let's check them to confirm what was needed:
 P4Runtime sh >>> table_entry["MyIngress.ether_addr_table"].read(lambda a: print(a))
 ```
 
-![complete table](blobs/complete-table.png)\
+![complete table](blobs/complete-table.png)  
 *Img 6: Final version of the table*
 
 ### 5. References
