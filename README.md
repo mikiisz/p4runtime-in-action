@@ -20,7 +20,17 @@ We use Mininet to create simple topology with 2 hosts and a switch. The P4Runtim
 It uses gRPC to connect the controller and the switch. 
 After P4Runtime Shell starts, it will install specified P4 program to the switch through the gRPC connection.
 
+Clone git repository 
+```
+git clone https://github.com/mikiisz/p4runtime-in-action.git
+```
+and move to created directory
+```
+cd p4runtime-in-action/
+```
+
 ![network](blobs/network-diagram.png)
+*Img 1: Network configuration*
 
 #### 1.1. Compile P4 switch definition
 
@@ -40,7 +50,7 @@ cd configs
 p4c --target bmv2 --arch v1model --p4runtime-files p4info.txt setup_switch.p4 
 ```
 
-As an output, it will generate few files with definition of our testing switch. 
+As an output, it will generate a few files with definition of our testing switch. 
 Later, we will launch the P4 Runtime Shell, using the p4info.txt and setup_switch.json files generated.
 
 #### 1.2. Launch the Mininet Environment
@@ -53,11 +63,37 @@ Below command will create a simple topology for our exercise:
 docker-compose run mininet --arp --topo single,2 --mac
 ```
 
-After successful creation, docker will switch into an interactive mode, you can check built topology and host configs by executing:
+After successful creation, docker will switch into an interactive mode:
+```
+*** Creating network
+*** Adding controller
+*** Adding hosts:
+h1 h2
+*** Adding switches:
+s1
+*** Adding links:
+(h1, s1) (h2, s1)
+*** Configuring hosts
+h1 h2
+*** Starting controller
+
+*** Starting 1 switches
+s1 ..⚡️ simple_switch_grpc @ 50001
+```
+
+you can check built topology and host configs by executing:
 
 ```
 mininet> net
+```
+as a result you should see logs like this:
+```
+h1 h1-eth0:s1-eth1
+h2 h2-eth0:s1-eth2
+s1 lo:  s1-eth1:h1-eth0 s1-eth2:h2-eth0
+```
 
+```
 mininet> h1 ifconfig h1-eth0
 ```
 
@@ -70,7 +106,17 @@ Make sure to connect properly to your mininet server running in the background f
 You can find the server id by running `sh ifconfig` in the mininet terminal:
 
 ```
-docker-compose run shell --grpc-addr <MININET SERVER IP>:50001 --device-id 1 --election-id 0,1 --config /tmp/configs/p4info.txt,/tmp/configs/setup_switch.json
+mininet> sh ifconfig
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.18.0.2  netmask 255.255.0.0  broadcast 172.18.255.255
+        ether 02:42:ac:12:00:02  txqueuelen 0  (Ethernet)
+        RX packets 14  bytes 1116 (1.0 KiB)
+```
+
+In this case ip addres is `172.18.0.2`, connect to you Mininet server using ip address and port 50001 on which Mininet is running:
+
+```
+docker-compose run shell --grpc-addr 172.18.0.2:50001 --device-id 1 --election-id 0,1 --config /tmp/configs/p4info.txt,/tmp/configs/setup_switch.json
 ```
 
 Let's display the preset tables (created in `./configs/setup_swish.p4` file) to confirm that it works:
@@ -79,13 +125,32 @@ Let's display the preset tables (created in `./configs/setup_swish.p4` file) to 
 P4Runtime sh >>> tables 
 
 P4Runtime sh >>> tables["MyIngress.ether_addr_table"] 
+Out[2]:
+preamble {
+  id: 45519652
+  name: "MyIngress.ether_addr_table"
+  alias: "ether_addr_table"
+}
+match_fields {
+  id: 1
+  name: "hdr.ethernet.dstAddr"
+  bitwidth: 48
+  match_type: EXACT
+}
+action_refs {
+  id: 29683729 ("MyIngress.forward")
+}
+action_refs {
+  id: 25585187 ("MyIngress.to_controller")
+}
+size: 1024
 ```
 
 Congratulations, your setup is finished.
 
 #### 1.4 Automated setup
 
-For future works, to make your life easier, you can use this oneliners to automate the setup of above steps:
+For future works, to make your life easier, you can use these oneliners to automate the setup of above steps:
 
 ```
 docker-compose -f docker-compose.automated.yml run mininet
@@ -117,6 +182,7 @@ Below figure represents the P4Runtime Architecture. The device or target to be c
 A role defines a grouping of P4 entities.
 
 ![P4 runtime architecture](blobs/p4runtime-architecture.svg)
+*Img 2: P4Runtime architecture*
 
 The P4Runtime API defines the messages and semantics of the interface between the client(s) and the server. 
 The API is specified by the p4runtime.proto Protobuf file.
@@ -131,7 +197,7 @@ It gives great understanding of concepts behind the API and helps to go through 
 
 ### 4. Action!
 
-Let's get hands dirty and set up our first switch table. 
+Let's get our hands dirty and set up our first switch table. 
 
 Try to ping host h1 with host h2 in mininet console:
 
@@ -141,9 +207,17 @@ mininet> h1 ping -c 1 h2
 
 It fails, as there is no rules set in switch table.
 
+```
+PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
+
+--- 10.0.0.2 ping statistics ---
+1 packets transmitted, 0 received, 100% packet loss, time 0m
+```
+
 In the setup stages we complied switch definition, where we defined a basic empty table called `MyIngress.ether_addr_table`.
 
 ![table definition](blobs/table-definition.png)
+*Img 3: Empty table definition*
 
 The ids associated with table and actions will differ in your example as they are generated once per instance. 
 Notice that we have described two actions: `MyIngress.forward` and `MyIngress.to_controller`.
@@ -198,7 +272,7 @@ updates {
         exact {
           value: "\x00\x00\x00\x00\x00\x02"
         }
-      }
+      } 
       action {
         action {
           action_id: 0 # TODO: provide action id
@@ -222,6 +296,7 @@ P4Runtime sh >>> table_entry["MyIngress.ether_addr_table"].read(lambda a: print(
 ```
 
 ![Added forward rule](blobs/added_forward_rule.png)
+*Img 4: Table with added forward rule*
 
 Let's check if the pinging works now:
 
@@ -242,6 +317,7 @@ However, try to provide that protobuf file based on the example from step *1.4*.
 After that step, we expect to have such a switching table:
 
 ![switching table](blobs/switch-table.png)
+*Img 5: Switching table*
 
 #### 4.3. Ping hosts
 
@@ -260,6 +336,7 @@ P4Runtime sh >>> table_entry["MyIngress.ether_addr_table"].read(lambda a: print(
 ```
 
 ![complete table](blobs/complete-table.png)
+*Img 6: Final version of the table*
 
 ### 5. References
 
